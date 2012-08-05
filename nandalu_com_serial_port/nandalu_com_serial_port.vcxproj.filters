@@ -21,9 +21,21 @@
     <ClCompile Include="com_port.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zmq_server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="com_port.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zmq_server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zmq_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zmq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

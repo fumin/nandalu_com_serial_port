@@ -1,5 +1,16 @@
 #include "com_port.h"
 
+struct com_port_t {
+	HANDLE hComm;
+};
+
+void phex(char* buf, int len) {
+	for(char* p = buf; p != buf + len; ++p){
+		printf("%02X ", *p);
+	}
+	printf("\n");
+}
+
 void ErrorExit(LPTSTR lpszFunction) { 
     // Retrieve the system error message for the last-error code
 
@@ -80,4 +91,52 @@ int init_com_port(LPTSTR gszPort, HANDLE* phComm){
     if (!SetCommTimeouts(*phComm, &timeouts)) return -1;
     // Error setting time-outs.
 	return 0;
+}
+
+ComPort newComPort(char* port) {
+	ComPort com_port;
+	com_port = (ComPort)malloc(sizeof(struct com_port_t));
+	init_com_port(port, &com_port->hComm);
+	return com_port;
+}
+
+void deleteComPort(ComPort com_port) {
+	CloseHandle(com_port->hComm);
+	free(com_port);
+}
+
+int read(ComPort cp, char* outbuf){
+	char buf[512];
+	DWORD numberOfBytesRead;
+	int rc, msg_len, totalNumOfBytesRead;
+	char* p = buf;
+	totalNumOfBytesRead = 0;
+	do {
+		rc = ReadFile(cp->hComm, p, 512-(p-buf), &numberOfBytesRead, NULL);
+		if(!rc) return -1;
+		p += numberOfBytesRead;
+		if(p-buf >= 512) return -1;
+		totalNumOfBytesRead += numberOfBytesRead;
+
+		for (char* pc = buf; pc != buf + totalNumOfBytesRead; pc++) {
+			if (!memcmp(pc, "\xA5\x5A", 2)) {
+				msg_len = *(pc + 2);
+				if ((pc-buf)+2+msg_len <= totalNumOfBytesRead) {
+					// plus 3 because \xA5\x5A#{payload length}
+					// minus 1 because the last byte is always \xBC
+					memcpy(outbuf, pc+3, msg_len-1);
+					buf[msg_len - 1] = '\0';
+					return msg_len-1;
+				} else {
+					break;
+				}
+			}
+		}
+	} while (1);
+}
+
+void write(ComPort cp, char* buf) {
+	DWORD numberOfBytesWritten;
+	int len = strlen(buf);
+	WriteFile(cp->hComm, buf, len, &numberOfBytesWritten, NULL);
 }

@@ -1,28 +1,38 @@
-#include "com_port.h"
+#include <mbstring.h>
 
-#define BUFFER_SIZE 256
+#include "com_port.h"
+#include "zmq_server.h"
+
+#define BUFFER_SIZE 512
 
 int main() {
-	HANDLE hComm;
-	init_com_port(TEXT("COM3"), &hComm);
-	
-	TBYTE lpBuffer[BUFFER_SIZE];
-	DWORD numberOfBytesRead, numberOfBytesWritten;
+	void* context = zmq_ctx_new();
+	ZMQServer zmq_server = newZMQServer(context, "tcp://*:5555", ZMQ_REP);
+	ZMQServer zmq_publisher = newZMQServer(context, "tcp://*:5556", ZMQ_PUB);
 
-	while(ReadFile(hComm, lpBuffer, BUFFER_SIZE, &numberOfBytesRead, NULL)){
-		// do our work
-		for (int i = 0; i < numberOfBytesRead; i++) {
-			if (i > 0) printf(" ");
-			printf("%02X", lpBuffer[i]);
+	ComPort cp = newComPort("COM5");
+    char buf[BUFFER_SIZE];
+	int len;
+	while(1){
+		len = read(zmq_server, buf);
+		if (!strcmp("lights on", buf)) {
+			write(cp, "\xA5\x5A\x02\xAA\xBC");
+		} else if (!strcmp("lights off", buf)) {
+			write(cp, "\xA5\x5A\x02\xBB\xBC");
 		}
-		printf("\n");
 
-		// notify when our light is dim
-		if (lpBuffer[1] < 16) {
-			WriteFile(hComm, "\xA5\x5A\x03\x11\x22\xBC", 6, &numberOfBytesWritten, NULL);
+		len = read(cp, buf);
+		phex(buf, len);
+		if (!strcmp("\xAB\xCD", buf)) {
+			printf("Lights ON! send to web server!\n");
+			write(zmq_server, "lights on OK");
+		} else if (!strcmp("\xCD\xEF", buf)) {
+			write(zmq_server, "lights off OK");
+		} else if (!strcmp("\x00\x00", buf)) {
+			write(zmq_server, "lights error");
+		} else {
+			write(zmq_publisher, (char*)buf);
 		}
 	}
-
-	ErrorExit(TEXT("ReadFile"));
 }
 
