@@ -1,5 +1,3 @@
-#include <mbstring.h>
-
 #include "com_port.h"
 #include "zmq_server.h"
 
@@ -24,7 +22,6 @@ int main() {
 		len = read(cp, buf);
 		phex(buf, len);
 		if (!strcmp("\xAB\xCD", buf)) {
-			printf("Lights ON! send to web server!\n");
 			write(zmq_server, "lights on OK");
 		} else if (!strcmp("\xCD\xEF", buf)) {
 			write(zmq_server, "lights off OK");

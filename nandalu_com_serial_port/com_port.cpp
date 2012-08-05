@@ -6,7 +6,7 @@ struct com_port_t {
 
 void phex(char* buf, int len) {
 	for(char* p = buf; p != buf + len; ++p){
-		printf("%02X ", *p);
+		printf("%02X ", (unsigned char)*p);
 	}
 	printf("\n");
 }
@@ -45,11 +45,11 @@ void ErrorExit(LPTSTR lpszFunction) {
 
 void PrintCommState(DCB dcb) {
     //  Print some of the DCB structure values
-    printf( TEXT("\nBaudRate = %d, ByteSize = %d, Parity = %d, StopBits = %d\n"), 
-              dcb.BaudRate, 
-              dcb.ByteSize, 
-              dcb.Parity,
-              dcb.StopBits );
+    printf("\nBaudRate = %d, ByteSize = %d, Parity = %d, StopBits = %d\n", 
+		dcb.BaudRate, 
+		dcb.ByteSize, 
+		dcb.Parity,
+		dcb.StopBits );
 }
 
 int init_com_port(LPTSTR gszPort, HANDLE* phComm){
@@ -125,7 +125,7 @@ int read(ComPort cp, char* outbuf){
 					// plus 3 because \xA5\x5A#{payload length}
 					// minus 1 because the last byte is always \xBC
 					memcpy(outbuf, pc+3, msg_len-1);
-					buf[msg_len - 1] = '\0';
+					outbuf[msg_len - 1] = '\0';
 					return msg_len-1;
 				} else {
 					break;
