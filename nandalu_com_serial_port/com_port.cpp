@@ -93,6 +93,19 @@ int init_com_port(LPTSTR gszPort, HANDLE* phComm){
 	return 0;
 }
 
+ComPort newComPort(int port_num) {
+	ComPort cp;
+	char port_buf[32];
+	if (port_num<10) {
+	    sprintf(port_buf, "COM%d", port_num);
+		cp = newComPort(port_buf);	
+	} else {
+		sprintf(port_buf, "\\\\.\\COM%d", port_num);
+		cp = newComPort(port_buf);
+	}
+	return cp;
+}
+
 ComPort newComPort(char* port) {
 	ComPort com_port;
 	com_port = (ComPort)malloc(sizeof(struct com_port_t));
@@ -120,7 +133,7 @@ int read(ComPort cp, char* outbuf){
 
 		for (char* pc = buf; pc != buf + totalNumOfBytesRead; pc++) {
 			if (!memcmp(pc, "\xA5\x5A", 2)) {
-				msg_len = *(pc + 2);
+				msg_len = (unsigned char)*(pc + 2);
 				if ((pc-buf)+2+msg_len <= totalNumOfBytesRead) {
 					// plus 3 because \xA5\x5A#{payload length}
 					// minus 1 because the last byte is always \xBC
@@ -135,8 +148,18 @@ int read(ComPort cp, char* outbuf){
 	} while (1);
 }
 
-void write(ComPort cp, char* buf) {
+void write(ComPort cp, char* buf, int len) {
 	DWORD numberOfBytesWritten;
-	int len = strlen(buf);
 	WriteFile(cp->hComm, buf, len, &numberOfBytesWritten, NULL);
 }
+
+void write(ComPort cp, char* buf, int len, char* mac_addr) {
+	char total_buf[256];
+	memcpy(total_buf, "\xA5\x5A", 2);
+	total_buf[2] = len + 8 + 1;
+	memcpy(total_buf + 3, buf, len);
+	memcpy(total_buf + 3 + len, mac_addr, 8);
+	total_buf[3 + len + 8] = '\xBC';
+	write(cp, total_buf, len + 8 + 4);
+}
+

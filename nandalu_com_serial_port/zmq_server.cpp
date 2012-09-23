@@ -36,7 +36,6 @@ int read(ZMQServer z, char* buf){
 	return 0;
 };
 
-void write(ZMQServer z, char* buf){
-	int len = strlen(buf);
+void write(ZMQServer z, char* buf, int len){
 	zmq_send (z->socket, buf, len, 0);
 };

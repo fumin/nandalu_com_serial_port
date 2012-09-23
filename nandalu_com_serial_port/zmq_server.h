@@ -8,6 +8,6 @@ typedef struct zmq_server_t* ZMQServer;
 ZMQServer newZMQServer(void* context, char* addr, int type);
 void deleteZMQServer(ZMQServer z);
 int read(ZMQServer z, char* buf);
-void write(ZMQServer z, char* buf);
+void write(ZMQServer z, char* buf, int len);
 
 #endif

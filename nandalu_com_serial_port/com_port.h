@@ -8,10 +8,12 @@
 
 typedef struct com_port_t* ComPort;
 
+ComPort newComPort(int port);
 ComPort newComPort(char* port);
 void deleteComPort(ComPort com_port);
 int read(ComPort cp, char* buf);
-void write(ComPort cp, char* buf);
+void write(ComPort cp, char* buf, int len);
+void write(ComPort cp, char* buf, int len, char* mac_addr);
 
 void ErrorExit(LPTSTR lpszFunction);
 void phex(char* buf, int len);
