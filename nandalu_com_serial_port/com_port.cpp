@@ -97,10 +97,12 @@ ComPort newComPort(int port_num) {
 	ComPort cp;
 	char port_buf[32];
 	if (port_num<10) {
-	    sprintf(port_buf, "COM%d", port_num);
+		sprintf_s(port_buf, 32, "COM%d", port_num);
+	    //sprintf(port_buf, "COM%d", port_num);
 		cp = newComPort(port_buf);	
 	} else {
-		sprintf(port_buf, "\\\\.\\COM%d", port_num);
+		sprintf_s(port_buf, 32, "\\\\.\\COM%d", port_num);
+		//sprintf(port_buf, "\\\\.\\COM%d", port_num);
 		cp = newComPort(port_buf);
 	}
 	return cp;

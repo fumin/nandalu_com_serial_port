@@ -24,6 +24,12 @@
     <ClCompile Include="zmq_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="subscriber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="com_port.h">
@@ -36,6 +42,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zmq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="subscriber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

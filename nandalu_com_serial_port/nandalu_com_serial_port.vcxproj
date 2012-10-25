@@ -80,10 +80,14 @@
   <ItemGroup>
     <ClCompile Include="com_port.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="subscriber.cpp" />
+    <ClCompile Include="zlist.cpp" />
     <ClCompile Include="zmq_server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="com_port.h" />
+    <ClInclude Include="subscriber.h" />
+    <ClInclude Include="zlist.h" />
     <ClInclude Include="zmq.h" />
     <ClInclude Include="zmq_server.h" />
     <ClInclude Include="zmq_utils.h" />
